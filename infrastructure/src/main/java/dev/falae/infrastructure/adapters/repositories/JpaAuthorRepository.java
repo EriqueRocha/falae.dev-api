@@ -135,6 +135,14 @@ public class JpaAuthorRepository implements AuthorRepository {
         jpaRepository.save(author);
     }
 
+    @Override
+    public void removeCoinsFromCurrentAuthor(int coins) {
+        AuthorEntity author = authenticatedAuthorProvider.getCurrentAuthor();
+        int newBalance = author.getBugCoins() - coins;
+        author.setBugCoins(Math.max(0, newBalance));
+        jpaRepository.save(author);
+    }
+
     public Author toDomain(AuthorEntity entity) {
         return new Author(
                 entity.getId(),

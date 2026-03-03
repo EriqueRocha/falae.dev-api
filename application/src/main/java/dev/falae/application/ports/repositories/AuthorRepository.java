@@ -18,4 +18,5 @@ public interface AuthorRepository {
     Author findById(UUID id);
     void deleteById(UUID id);
     void addCoinsToCurrentAuthor(int coins);
+    void removeCoinsFromCurrentAuthor(int coins);
 }

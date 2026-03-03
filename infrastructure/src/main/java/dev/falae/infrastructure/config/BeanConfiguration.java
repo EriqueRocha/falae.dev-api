@@ -115,15 +115,19 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public DeleteTopicUseCase DeleteTopicUseCase(TopicRepository topicRepository){
-        return new DeleteTopicUseCase(topicRepository);
+    public DeleteTopicUseCase deleteTopicUseCase(TopicRepository topicRepository,
+                                                  ForumConfigRepository forumConfigRepository,
+                                                  AuthorRepository authorRepository){
+        return new DeleteTopicUseCase(topicRepository, forumConfigRepository, authorRepository);
     }
 
     @Bean
     public DeleteArticleUseCase deleteArticleUseCase(ArticleRepository articleRepository,
                                                      AuthenticationService authenticationService,
-                                                     StorageService storageService) {
-        return new DeleteArticleUseCase(articleRepository, authenticationService, storageService);
+                                                     StorageService storageService,
+                                                     ForumConfigRepository forumConfigRepository,
+                                                     AuthorRepository authorRepository) {
+        return new DeleteArticleUseCase(articleRepository, authenticationService, storageService, forumConfigRepository, authorRepository);
     }
 
     @Bean
@@ -137,8 +141,10 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public DeleteCommentUseCase deleteCommentUseCase(CommentRepository commentRepository) {
-        return new DeleteCommentUseCase(commentRepository);
+    public DeleteCommentUseCase deleteCommentUseCase(CommentRepository commentRepository,
+                                                      ForumConfigRepository forumConfigRepository,
+                                                      AuthorRepository authorRepository) {
+        return new DeleteCommentUseCase(commentRepository, forumConfigRepository, authorRepository);
     }
 
     @Bean
