@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: falae-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: falae_db_v2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha123
+    ports:
+      - "5432:5432"
+    volumes:
+      - falae_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d falae_db_v2"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  falae_postgres_data:

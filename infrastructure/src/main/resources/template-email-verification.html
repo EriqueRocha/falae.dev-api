@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falae.dev - Verificar Email</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1c1935 !important;
+            font-family: 'Open Sans', sans-serif;
+            text-align: center;
+        }
+        .bg{
+            background-color: #27253f;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        p, a {
+            color: white !important;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: justify;
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #2e2859;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #aaa !important;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1><strong>Falae.dev</strong></h1>
+    <div class="bg">
+        <p class="message">
+            Ola #{nome},<br><br>
+            Para completar seu cadastro no Falae.dev, por favor confirme seu email clicando no botao abaixo.
+        </p>
+        <a href="#{verificationLink}" class="button">Verificar Email</a>
+        <p class="note">
+            Este link expira em 24 horas. Se voce nao solicitou este email, pode ignora-lo.
+        </p>
+    </div>
+
+</div>
+</body>
+</html>
