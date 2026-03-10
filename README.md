@@ -91,6 +91,16 @@ GOOGLE_CLIENT_ID=...
 RESEND_API_KEY=...
 ```
 
-## Licenca
+## Ambientes
 
-Projeto privado.
+### prd
+front: https://falae.dev
+
+back: https://api.falae.dev
+
+### hmg
+front: https://test.falae.dev
+
+back: https://test-api.falae.dev
+
+**OBS: o back do ambiente de homologação tem um cold start de 1min**
