@@ -99,6 +99,8 @@ public class CreateCommentUseCase {
 
     private void registerCommentInteractions(Author currentAuthor, Comment savedComment,
                                               Article article, Topic topic, java.util.UUID parentId) {
+        TargetType parentContentType = article != null ? TargetType.ARTICLE : TargetType.TOPIC;
+
         // If it's a reply to another comment, notify the parent comment owner
         if (parentId != null) {
             Comment parentComment = commentRepository.findById(parentId);
@@ -117,7 +119,8 @@ public class CreateCommentUseCase {
                             savedComment.getId(),
                             targetTitle,
                             targetSlug,
-                            savedComment.getId()
+                            savedComment.getId(),
+                            parentContentType
                     );
                     authorInteractionRepository.save(replyInteraction);
                 }
@@ -137,7 +140,8 @@ public class CreateCommentUseCase {
                         article.getId(),
                         article.getTitle(),
                         article.getSlug(),
-                        savedComment.getId()
+                        savedComment.getId(),
+                        TargetType.ARTICLE
                 );
                 authorInteractionRepository.save(interaction);
             }
@@ -153,7 +157,8 @@ public class CreateCommentUseCase {
                         topic.getId(),
                         topic.getTitle(),
                         topic.getSlug(),
-                        savedComment.getId()
+                        savedComment.getId(),
+                        TargetType.TOPIC
                 );
                 authorInteractionRepository.save(interaction);
             }

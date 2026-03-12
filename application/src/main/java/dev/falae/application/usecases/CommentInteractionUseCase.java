@@ -34,15 +34,18 @@ public class CommentInteractionUseCase {
 
         if (comment != null && comment.getAuthor() != null
                 && !comment.getAuthor().getId().equals(currentAuthor.getId())) {
-            // Get the title and slug from the parent article or topic
+            // Get the title, slug and parent content type from the parent article or topic
             String targetTitle = null;
             String targetSlug = null;
+            TargetType parentContentType = null;
             if (comment.getArticle() != null) {
                 targetTitle = comment.getArticle().getTitle();
                 targetSlug = comment.getArticle().getSlug();
+                parentContentType = TargetType.ARTICLE;
             } else if (comment.getTopic() != null) {
                 targetTitle = comment.getTopic().getTitle();
                 targetSlug = comment.getTopic().getSlug();
+                parentContentType = TargetType.TOPIC;
             }
 
             if (isNowLiked) {
@@ -53,7 +56,9 @@ public class CommentInteractionUseCase {
                         TargetType.COMMENT,
                         comment.getId(),
                         targetTitle,
-                        targetSlug
+                        targetSlug,
+                        comment.getId(),
+                        parentContentType
                 );
                 authorInteractionRepository.save(interaction);
             } else {

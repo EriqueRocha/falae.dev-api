@@ -20,6 +20,7 @@ public class AuthorInteraction {
     private String targetTitle;
     private String targetSlug;
     private UUID commentId;
+    private TargetType parentContentType;
     private boolean isRead;
     private LocalDateTime createdAt;
 
@@ -45,13 +46,20 @@ public class AuthorInteraction {
     public static AuthorInteraction create(UUID recipientAuthorId, UUID actorAuthorId,
                                             InteractionType interactionType, TargetType targetType,
                                             UUID targetId, String targetTitle, String targetSlug) {
-        return create(recipientAuthorId, actorAuthorId, interactionType, targetType, targetId, targetTitle, targetSlug, null);
+        return create(recipientAuthorId, actorAuthorId, interactionType, targetType, targetId, targetTitle, targetSlug, null, null);
     }
 
     public static AuthorInteraction create(UUID recipientAuthorId, UUID actorAuthorId,
                                             InteractionType interactionType, TargetType targetType,
                                             UUID targetId, String targetTitle, String targetSlug,
                                             UUID commentId) {
+        return create(recipientAuthorId, actorAuthorId, interactionType, targetType, targetId, targetTitle, targetSlug, commentId, null);
+    }
+
+    public static AuthorInteraction create(UUID recipientAuthorId, UUID actorAuthorId,
+                                            InteractionType interactionType, TargetType targetType,
+                                            UUID targetId, String targetTitle, String targetSlug,
+                                            UUID commentId, TargetType parentContentType) {
         AuthorInteraction interaction = new AuthorInteraction(
                 UUID.randomUUID(),
                 recipientAuthorId,
@@ -65,6 +73,7 @@ public class AuthorInteraction {
                 LocalDateTime.now()
         );
         interaction.setCommentId(commentId);
+        interaction.setParentContentType(parentContentType);
         return interaction;
     }
 
@@ -164,6 +173,14 @@ public class AuthorInteraction {
 
     public void setCommentId(UUID commentId) {
         this.commentId = commentId;
+    }
+
+    public TargetType getParentContentType() {
+        return parentContentType;
+    }
+
+    public void setParentContentType(TargetType parentContentType) {
+        this.parentContentType = parentContentType;
     }
 
     public boolean isRead() {

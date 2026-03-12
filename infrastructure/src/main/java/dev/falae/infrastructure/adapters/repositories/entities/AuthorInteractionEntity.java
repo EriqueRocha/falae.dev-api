@@ -40,6 +40,9 @@ public class AuthorInteractionEntity {
     @Column(name = "comment_id")
     private UUID commentId;
 
+    @Column(name = "parent_content_type", length = 15)
+    private String parentContentType;
+
     @Column(name = "is_read", nullable = false)
     private boolean isRead = false;
 
@@ -129,6 +132,14 @@ public class AuthorInteractionEntity {
 
     public void setCommentId(UUID commentId) {
         this.commentId = commentId;
+    }
+
+    public String getParentContentType() {
+        return parentContentType;
+    }
+
+    public void setParentContentType(String parentContentType) {
+        this.parentContentType = parentContentType;
     }
 
     public boolean isRead() {
