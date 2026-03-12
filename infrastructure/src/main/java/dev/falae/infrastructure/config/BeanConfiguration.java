@@ -97,8 +97,9 @@ public class BeanConfiguration {
             TopicRepository topicRepository,
             ForumConfigRepository forumConfigRepository,
             AuthorRepository authorRepository,
-            AuthenticationService authenticationService) {
-        return new CreateCommentUseCase(commentRepository, articleRepository, topicRepository, forumConfigRepository, authorRepository, authenticationService);
+            AuthenticationService authenticationService,
+            AuthorInteractionRepository authorInteractionRepository) {
+        return new CreateCommentUseCase(commentRepository, articleRepository, topicRepository, forumConfigRepository, authorRepository, authenticationService, authorInteractionRepository);
     }
 
     @Bean
@@ -182,18 +183,27 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public ArticleInteractionUseCase articleInteractionUseCase(ArticleRepository articleRepository) {
-        return new ArticleInteractionUseCase(articleRepository);
+    public ArticleInteractionUseCase articleInteractionUseCase(
+            ArticleRepository articleRepository,
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new ArticleInteractionUseCase(articleRepository, authorInteractionRepository, authenticationService);
     }
 
     @Bean
-    public TopicInteractionUseCase topicInteractionUseCase(TopicRepository topicRepository) {
-        return new TopicInteractionUseCase(topicRepository);
+    public TopicInteractionUseCase topicInteractionUseCase(
+            TopicRepository topicRepository,
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new TopicInteractionUseCase(topicRepository, authorInteractionRepository, authenticationService);
     }
 
     @Bean
-    public CommentInteractionUseCase commentInteractionUseCase(CommentRepository commentRepository) {
-        return new CommentInteractionUseCase(commentRepository);
+    public CommentInteractionUseCase commentInteractionUseCase(
+            CommentRepository commentRepository,
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new CommentInteractionUseCase(commentRepository, authorInteractionRepository, authenticationService);
     }
 
     @Bean
@@ -234,5 +244,33 @@ public class BeanConfiguration {
     @Bean
     public SearchByTagsUseCase searchByTagsUseCase(SearchRepository searchRepository) {
         return new SearchByTagsUseCase(searchRepository);
+    }
+
+    @Bean
+    public GetAuthorInteractionsUseCase getAuthorInteractionsUseCase(
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new GetAuthorInteractionsUseCase(authorInteractionRepository, authenticationService);
+    }
+
+    @Bean
+    public GetUnreadCountUseCase getUnreadCountUseCase(
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new GetUnreadCountUseCase(authorInteractionRepository, authenticationService);
+    }
+
+    @Bean
+    public MarkInteractionReadUseCase markInteractionReadUseCase(
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new MarkInteractionReadUseCase(authorInteractionRepository, authenticationService);
+    }
+
+    @Bean
+    public MarkAllInteractionsReadUseCase markAllInteractionsReadUseCase(
+            AuthorInteractionRepository authorInteractionRepository,
+            AuthenticationService authenticationService) {
+        return new MarkAllInteractionsReadUseCase(authorInteractionRepository, authenticationService);
     }
 }

@@ -362,6 +362,81 @@ Documentacao das rotas da API organizadas por controller.
 
 ---
 
+## InteractionController (`/api/authors/me/interactions`)
+
+> Todas as rotas requerem autenticacao de autor.
+
+### GET `/api/authors/me/interactions`
+**Descricao:** Lista interacoes/notificacoes do autor autenticado (paginado).
+
+**Query Parameters:**
+
+| Nome | Tipo | Default | Descricao |
+|------|------|---------|-----------|
+| page | int | 0 | Numero da pagina |
+| size | int | 20 | Tamanho da pagina |
+
+**Response:**
+```json
+{
+  "interactions": [
+    {
+      "id": "UUID",
+      "actorAuthorId": "UUID",
+      "actorName": "string",
+      "actorUserName": "string",
+      "actorProfileImageUrl": "string | null",
+      "interactionType": "COMMENT_ON_ARTICLE | COMMENT_ON_TOPIC | REPLY_TO_COMMENT | LIKE_ARTICLE | LIKE_TOPIC | LIKE_COMMENT | SAVE_ARTICLE",
+      "targetType": "ARTICLE | TOPIC | COMMENT",
+      "targetId": "UUID",
+      "targetTitle": "string | null",
+      "targetSlug": "string | null",
+      "isRead": "boolean",
+      "createdAt": "LocalDateTime"
+    }
+  ],
+  "page": "int",
+  "size": "int",
+  "totalElements": "long",
+  "totalPages": "int",
+  "hasNext": "boolean"
+}
+```
+
+---
+
+### GET `/api/authors/me/interactions/unread-count`
+**Descricao:** Retorna a contagem de interacoes nao lidas.
+
+**Response:**
+```json
+{
+  "count": "long"
+}
+```
+
+---
+
+### PATCH `/api/authors/me/interactions/{id}/read`
+**Descricao:** Marca uma interacao especifica como lida.
+
+**Path Parameters:**
+
+| Nome | Tipo | Descricao |
+|------|------|-----------|
+| id | UUID | ID da interacao |
+
+**Response:** `204 No Content`
+
+---
+
+### PATCH `/api/authors/me/interactions/read-all`
+**Descricao:** Marca todas as interacoes como lidas.
+
+**Response:** `204 No Content`
+
+---
+
 ## ArticleController (`/article`)
 
 ### POST `/article/saveNew`
@@ -1389,6 +1464,24 @@ ALL      - Todos os tipos de conteudo
 ARTICLE  - Apenas artigos
 TOPIC    - Apenas topicos
 COMMENT  - Apenas comentarios
+```
+
+### InteractionType (enum)
+```
+COMMENT_ON_ARTICLE - Alguem comentou no seu artigo
+COMMENT_ON_TOPIC   - Alguem comentou no seu topico
+REPLY_TO_COMMENT   - Alguem respondeu ao seu comentario
+LIKE_ARTICLE       - Alguem curtiu seu artigo
+LIKE_TOPIC         - Alguem curtiu seu topico
+LIKE_COMMENT       - Alguem curtiu seu comentario
+SAVE_ARTICLE       - Alguem salvou seu artigo
+```
+
+### TargetType (enum)
+```
+ARTICLE  - Artigo
+TOPIC    - Topico
+COMMENT  - Comentario
 ```
 
 ---

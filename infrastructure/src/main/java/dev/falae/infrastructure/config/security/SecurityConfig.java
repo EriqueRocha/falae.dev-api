@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         //author endpoints (or ADMIN)
+                        .requestMatchers("/api/authors/me/**").hasAnyRole("AUTHOR", "ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/authors/profile-image").hasAnyRole("AUTHOR", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/article/**").hasAnyRole("AUTHOR", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/article/**").hasAnyRole("AUTHOR", "ADMIN")
