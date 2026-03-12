@@ -37,6 +37,9 @@ public class AuthorInteractionEntity {
     @Column(name = "target_slug", length = 255)
     private String targetSlug;
 
+    @Column(name = "comment_id")
+    private UUID commentId;
+
     @Column(name = "is_read", nullable = false)
     private boolean isRead = false;
 
@@ -118,6 +121,14 @@ public class AuthorInteractionEntity {
 
     public void setTargetSlug(String targetSlug) {
         this.targetSlug = targetSlug;
+    }
+
+    public UUID getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(UUID commentId) {
+        this.commentId = commentId;
     }
 
     public boolean isRead() {

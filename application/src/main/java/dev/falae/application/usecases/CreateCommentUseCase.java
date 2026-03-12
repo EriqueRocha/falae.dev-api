@@ -116,7 +116,8 @@ public class CreateCommentUseCase {
                             TargetType.COMMENT,
                             savedComment.getId(),
                             targetTitle,
-                            targetSlug
+                            targetSlug,
+                            savedComment.getId()
                     );
                     authorInteractionRepository.save(replyInteraction);
                 }
@@ -135,7 +136,8 @@ public class CreateCommentUseCase {
                         TargetType.ARTICLE,
                         article.getId(),
                         article.getTitle(),
-                        article.getSlug()
+                        article.getSlug(),
+                        savedComment.getId()
                 );
                 authorInteractionRepository.save(interaction);
             }
@@ -150,7 +152,8 @@ public class CreateCommentUseCase {
                         TargetType.TOPIC,
                         topic.getId(),
                         topic.getTitle(),
-                        topic.getSlug()
+                        topic.getSlug(),
+                        savedComment.getId()
                 );
                 authorInteractionRepository.save(interaction);
             }

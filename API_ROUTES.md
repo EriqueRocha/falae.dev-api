@@ -391,6 +391,7 @@ Documentacao das rotas da API organizadas por controller.
       "targetId": "UUID",
       "targetTitle": "string | null",
       "targetSlug": "string | null",
+      "commentId": "UUID | null",
       "isRead": "boolean",
       "createdAt": "LocalDateTime"
     }
@@ -402,6 +403,8 @@ Documentacao das rotas da API organizadas por controller.
   "hasNext": "boolean"
 }
 ```
+
+> **Nota:** O campo `commentId` e preenchido apenas para interacoes do tipo COMMENT_ON_ARTICLE, COMMENT_ON_TOPIC e REPLY_TO_COMMENT. Use este ID para construir URLs que apontem diretamente para o comentario (ex: `/{userName}/{targetSlug}?commentId={commentId}`).
 
 ---
 

@@ -94,6 +94,7 @@ public class JpaAuthorInteractionRepository implements AuthorInteractionReposito
         entity.setTargetId(interaction.getTargetId());
         entity.setTargetTitle(interaction.getTargetTitle());
         entity.setTargetSlug(interaction.getTargetSlug());
+        entity.setCommentId(interaction.getCommentId());
         entity.setRead(interaction.isRead());
         entity.setCreatedAt(interaction.getCreatedAt());
         return entity;
@@ -111,6 +112,7 @@ public class JpaAuthorInteractionRepository implements AuthorInteractionReposito
                 entity.getTargetId(),
                 entity.getTargetTitle(),
                 entity.getTargetSlug(),
+                entity.getCommentId(),
                 entity.isRead(),
                 entity.getCreatedAt()
         );

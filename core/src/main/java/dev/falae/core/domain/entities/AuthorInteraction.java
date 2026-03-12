@@ -19,6 +19,7 @@ public class AuthorInteraction {
     private UUID targetId;
     private String targetTitle;
     private String targetSlug;
+    private UUID commentId;
     private boolean isRead;
     private LocalDateTime createdAt;
 
@@ -44,7 +45,14 @@ public class AuthorInteraction {
     public static AuthorInteraction create(UUID recipientAuthorId, UUID actorAuthorId,
                                             InteractionType interactionType, TargetType targetType,
                                             UUID targetId, String targetTitle, String targetSlug) {
-        return new AuthorInteraction(
+        return create(recipientAuthorId, actorAuthorId, interactionType, targetType, targetId, targetTitle, targetSlug, null);
+    }
+
+    public static AuthorInteraction create(UUID recipientAuthorId, UUID actorAuthorId,
+                                            InteractionType interactionType, TargetType targetType,
+                                            UUID targetId, String targetTitle, String targetSlug,
+                                            UUID commentId) {
+        AuthorInteraction interaction = new AuthorInteraction(
                 UUID.randomUUID(),
                 recipientAuthorId,
                 actorAuthorId,
@@ -56,6 +64,8 @@ public class AuthorInteraction {
                 false,
                 LocalDateTime.now()
         );
+        interaction.setCommentId(commentId);
+        return interaction;
     }
 
     // Getters and Setters
@@ -146,6 +156,14 @@ public class AuthorInteraction {
 
     public void setTargetSlug(String targetSlug) {
         this.targetSlug = targetSlug;
+    }
+
+    public UUID getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(UUID commentId) {
+        this.commentId = commentId;
     }
 
     public boolean isRead() {
