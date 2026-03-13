@@ -393,6 +393,7 @@ Documentacao das rotas da API organizadas por controller.
       "targetSlug": "string | null",
       "commentId": "UUID | null",
       "parentContentType": "ARTICLE | TOPIC | null",
+      "parentAuthorUserName": "string | null",
       "isRead": "boolean",
       "createdAt": "LocalDateTime"
     }
@@ -408,9 +409,10 @@ Documentacao das rotas da API organizadas por controller.
 > **Nota:** Para interacoes relacionadas a comentarios (COMMENT_ON_ARTICLE, COMMENT_ON_TOPIC, REPLY_TO_COMMENT, LIKE_COMMENT):
 > - `commentId`: ID do comentario criado/curtido
 > - `parentContentType`: indica se o comentario pertence a um ARTICLE ou TOPIC
+> - `parentAuthorUserName`: username do autor do artigo/topico pai (necessario para construir a URL correta quando o comentario esta em conteudo de outro autor)
 > - `targetSlug`: slug do artigo/topico pai
 >
-> Use estes campos para construir URLs: `/{userName}/{targetSlug}?commentId={commentId}`
+> Use estes campos para construir URLs: `/{parentAuthorUserName}/{targetSlug}?commentId={commentId}`
 
 ---
 

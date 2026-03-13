@@ -96,6 +96,7 @@ public class JpaAuthorInteractionRepository implements AuthorInteractionReposito
         entity.setTargetSlug(interaction.getTargetSlug());
         entity.setCommentId(interaction.getCommentId());
         entity.setParentContentType(interaction.getParentContentType() != null ? interaction.getParentContentType().name() : null);
+        entity.setParentAuthorUserName(interaction.getParentAuthorUserName());
         entity.setRead(interaction.isRead());
         entity.setCreatedAt(interaction.getCreatedAt());
         return entity;
@@ -115,6 +116,7 @@ public class JpaAuthorInteractionRepository implements AuthorInteractionReposito
                 entity.getTargetSlug(),
                 entity.getCommentId(),
                 entity.getParentContentType() != null ? TargetType.valueOf(entity.getParentContentType()) : null,
+                entity.getParentAuthorUserName(),
                 entity.isRead(),
                 entity.getCreatedAt()
         );

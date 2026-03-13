@@ -21,6 +21,7 @@ public class AuthorInteraction {
     private String targetSlug;
     private UUID commentId;
     private TargetType parentContentType;
+    private String parentAuthorUserName;
     private boolean isRead;
     private LocalDateTime createdAt;
 
@@ -60,6 +61,13 @@ public class AuthorInteraction {
                                             InteractionType interactionType, TargetType targetType,
                                             UUID targetId, String targetTitle, String targetSlug,
                                             UUID commentId, TargetType parentContentType) {
+        return create(recipientAuthorId, actorAuthorId, interactionType, targetType, targetId, targetTitle, targetSlug, commentId, parentContentType, null);
+    }
+
+    public static AuthorInteraction create(UUID recipientAuthorId, UUID actorAuthorId,
+                                            InteractionType interactionType, TargetType targetType,
+                                            UUID targetId, String targetTitle, String targetSlug,
+                                            UUID commentId, TargetType parentContentType, String parentAuthorUserName) {
         AuthorInteraction interaction = new AuthorInteraction(
                 UUID.randomUUID(),
                 recipientAuthorId,
@@ -74,6 +82,7 @@ public class AuthorInteraction {
         );
         interaction.setCommentId(commentId);
         interaction.setParentContentType(parentContentType);
+        interaction.setParentAuthorUserName(parentAuthorUserName);
         return interaction;
     }
 
@@ -181,6 +190,14 @@ public class AuthorInteraction {
 
     public void setParentContentType(TargetType parentContentType) {
         this.parentContentType = parentContentType;
+    }
+
+    public String getParentAuthorUserName() {
+        return parentAuthorUserName;
+    }
+
+    public void setParentAuthorUserName(String parentAuthorUserName) {
+        this.parentAuthorUserName = parentAuthorUserName;
     }
 
     public boolean isRead() {

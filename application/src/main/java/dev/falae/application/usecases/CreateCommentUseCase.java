@@ -100,6 +100,12 @@ public class CreateCommentUseCase {
     private void registerCommentInteractions(Author currentAuthor, Comment savedComment,
                                               Article article, Topic topic, java.util.UUID parentId) {
         TargetType parentContentType = article != null ? TargetType.ARTICLE : TargetType.TOPIC;
+        String parentAuthorUserName = null;
+        if (article != null && article.getAuthor() != null) {
+            parentAuthorUserName = article.getAuthor().getUserName();
+        } else if (topic != null && topic.getAuthor() != null) {
+            parentAuthorUserName = topic.getAuthor().getUserName();
+        }
 
         // If it's a reply to another comment, notify the parent comment owner
         if (parentId != null) {
@@ -120,7 +126,8 @@ public class CreateCommentUseCase {
                             targetTitle,
                             targetSlug,
                             savedComment.getId(),
-                            parentContentType
+                            parentContentType,
+                            parentAuthorUserName
                     );
                     authorInteractionRepository.save(replyInteraction);
                 }
@@ -141,7 +148,8 @@ public class CreateCommentUseCase {
                         article.getTitle(),
                         article.getSlug(),
                         savedComment.getId(),
-                        TargetType.ARTICLE
+                        TargetType.ARTICLE,
+                        parentAuthorUserName
                 );
                 authorInteractionRepository.save(interaction);
             }
@@ -158,7 +166,8 @@ public class CreateCommentUseCase {
                         topic.getTitle(),
                         topic.getSlug(),
                         savedComment.getId(),
-                        TargetType.TOPIC
+                        TargetType.TOPIC,
+                        parentAuthorUserName
                 );
                 authorInteractionRepository.save(interaction);
             }

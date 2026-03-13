@@ -19,6 +19,7 @@ public record AuthorInteractionResponse(
         String targetSlug,
         UUID commentId,
         TargetType parentContentType,
+        String parentAuthorUserName,
         boolean isRead,
         LocalDateTime createdAt
 ) {}

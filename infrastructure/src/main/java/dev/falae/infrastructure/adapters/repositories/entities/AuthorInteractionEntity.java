@@ -43,6 +43,9 @@ public class AuthorInteractionEntity {
     @Column(name = "parent_content_type", length = 15)
     private String parentContentType;
 
+    @Column(name = "parent_author_user_name", length = 50)
+    private String parentAuthorUserName;
+
     @Column(name = "is_read", nullable = false)
     private boolean isRead = false;
 
@@ -140,6 +143,14 @@ public class AuthorInteractionEntity {
 
     public void setParentContentType(String parentContentType) {
         this.parentContentType = parentContentType;
+    }
+
+    public String getParentAuthorUserName() {
+        return parentAuthorUserName;
+    }
+
+    public void setParentAuthorUserName(String parentAuthorUserName) {
+        this.parentAuthorUserName = parentAuthorUserName;
     }
 
     public boolean isRead() {
