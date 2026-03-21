@@ -136,4 +136,31 @@ public class S3StorageService implements StorageService {
         }
         return extractKeyFromUrl(url);
     }
+
+    public String moveFileToPublicPath(String privateUrl) {
+        if (privateUrl == null || privateUrl.isEmpty()) {
+            return null;
+        }
+
+        String sourceKey = extractKeyFromPublicUrl(privateUrl);
+        if (sourceKey == null || !sourceKey.contains("/private/")) {
+            return privateUrl;
+        }
+
+        String destinationKey = sourceKey.replace("/private/", "/");
+
+        s3Client.copyObject(builder -> builder
+                .sourceBucket(bucketName)
+                .sourceKey(sourceKey)
+                .destinationBucket(bucketName)
+                .destinationKey(destinationKey)
+        );
+
+        s3Client.deleteObject(builder -> builder
+                .bucket(bucketName)
+                .key(sourceKey)
+        );
+
+        return publicUrl + "/" + destinationKey;
+    }
 }

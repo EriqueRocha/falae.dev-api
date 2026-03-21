@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -457,6 +458,20 @@ public class JpaArticleRepository implements ArticleRepository {
 
         if (!articleEntity.getAuthor().getId().equals(author.getId())) {
             throw new ResourceNotFoundException("Article", articleId);
+        }
+
+        String newContentUrl = s3StorageService.moveFileToPublicPath(articleEntity.getUrlArticleContent());
+        articleEntity.setUrlArticleContent(newContentUrl);
+
+        String newCoverUrl = s3StorageService.moveFileToPublicPath(articleEntity.getCoverImage());
+        articleEntity.setCoverImage(newCoverUrl);
+
+        if (articleEntity.getImagePaths() != null && !articleEntity.getImagePaths().isEmpty()) {
+            List<String> newImagePaths = new ArrayList<>();
+            for (String imagePath : articleEntity.getImagePaths()) {
+                newImagePaths.add(s3StorageService.moveFileToPublicPath(imagePath));
+            }
+            articleEntity.setImagePaths(newImagePaths);
         }
 
         articleEntity.setPrivate(false);
