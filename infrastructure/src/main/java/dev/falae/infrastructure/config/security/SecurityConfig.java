@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/feed/**").permitAll()
                         .requestMatchers("/api/forum/**").permitAll()
                         .requestMatchers("/api/search/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/article/private").hasAnyRole("AUTHOR", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/article/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/topic/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/comment/**").permitAll()

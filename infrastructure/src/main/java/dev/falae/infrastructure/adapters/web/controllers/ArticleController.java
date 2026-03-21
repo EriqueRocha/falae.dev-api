@@ -7,6 +7,8 @@ import dev.falae.application.usecases.DeleteArticleUseCase;
 import dev.falae.application.usecases.EditArticleUseCase;
 import dev.falae.application.usecases.FindArticleUseCase;
 import dev.falae.application.usecases.FindArticlesUseCase;
+import dev.falae.application.usecases.GetPrivateArticlesUseCase;
+import dev.falae.application.usecases.PublishArticleUseCase;
 import dev.falae.infrastructure.adapters.services.ContentArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -29,8 +31,10 @@ public class ArticleController {
     private final FindArticleUseCase findArticleUseCase;
     private final FindArticlesUseCase findArticlesUseCase;
     private final ArticleInteractionUseCase articleInteractionUseCase;
+    private final GetPrivateArticlesUseCase getPrivateArticlesUseCase;
+    private final PublishArticleUseCase publishArticleUseCase;
 
-    public ArticleController(CreateArticleUseCase createArticleUseCase, EditArticleUseCase editArticleUseCase, ContentArticleService contentArticleService, DeleteArticleUseCase deleteArticleUseCase, FindArticleUseCase findArticleUseCase, FindArticlesUseCase findArticlesUseCase, ArticleInteractionUseCase articleInteractionUseCase) {
+    public ArticleController(CreateArticleUseCase createArticleUseCase, EditArticleUseCase editArticleUseCase, ContentArticleService contentArticleService, DeleteArticleUseCase deleteArticleUseCase, FindArticleUseCase findArticleUseCase, FindArticlesUseCase findArticlesUseCase, ArticleInteractionUseCase articleInteractionUseCase, GetPrivateArticlesUseCase getPrivateArticlesUseCase, PublishArticleUseCase publishArticleUseCase) {
         this.createArticleUseCase = createArticleUseCase;
         this.editArticleUseCase = editArticleUseCase;
         this.contentArticleService = contentArticleService;
@@ -38,6 +42,8 @@ public class ArticleController {
         this.findArticleUseCase = findArticleUseCase;
         this.findArticlesUseCase = findArticlesUseCase;
         this.articleInteractionUseCase = articleInteractionUseCase;
+        this.getPrivateArticlesUseCase = getPrivateArticlesUseCase;
+        this.publishArticleUseCase = publishArticleUseCase;
     }
 
     @PostMapping(value = "/saveNew")
@@ -127,5 +133,21 @@ public class ArticleController {
     @Operation(summary = "Dar/remover dislike em um artigo (author)")
     public ResponseEntity<InteractionResponse> toggleDislike(@PathVariable UUID articleId) {
         return ResponseEntity.ok(articleInteractionUseCase.toggleDislike(articleId));
+    }
+
+    @GetMapping("/private")
+    @Operation(summary = "Listar artigos privados do autor logado")
+    public ResponseEntity<ArticlePageResponse> getPrivateArticles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "RECENT") AuthorContentSortType sort) {
+        return ResponseEntity.ok(getPrivateArticlesUseCase.execute(page, size, sort));
+    }
+
+    @PostMapping(value = "/{articleId}/publish")
+    @Operation(summary = "Publicar um artigo privado")
+    public ResponseEntity<Void> publishArticle(@PathVariable UUID articleId) {
+        publishArticleUseCase.execute(articleId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -25,6 +25,8 @@ public record SaveArticleRequest(
             regexp = "^(https?://[\\w\\-._~:/?#\\[\\]@!$&'()*+,;=%]+)?$",
             message = "O originalPost deve ser uma URL válida."
     )
-    String originalPost
+    String originalPost,
+
+    Boolean isPrivate
 ) {
 }

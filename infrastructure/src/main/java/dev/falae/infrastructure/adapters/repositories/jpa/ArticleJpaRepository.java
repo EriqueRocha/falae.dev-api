@@ -11,30 +11,39 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ArticleJpaRepository extends JpaRepository<ArticleEntity, UUID> {
-    Page<ArticleEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
-    Page<ArticleEntity> findAllByOrderByCreatedAtAsc(Pageable pageable);
-    Page<ArticleEntity> findAllByOrderByLikesCountDesc(Pageable pageable);
+    Page<ArticleEntity> findByIsPrivateFalseOrderByCreatedAtDesc(Pageable pageable);
+    Page<ArticleEntity> findByIsPrivateFalseOrderByCreatedAtAsc(Pageable pageable);
+    Page<ArticleEntity> findByIsPrivateFalseOrderByLikesCountDesc(Pageable pageable);
 
-    Page<ArticleEntity> findByAuthorUserNameOrderByCreatedAtDesc(String userName, Pageable pageable);
-    Page<ArticleEntity> findByAuthorUserNameOrderByCreatedAtAsc(String userName, Pageable pageable);
-    Page<ArticleEntity> findByAuthorUserNameOrderByLikesCountDesc(String userName, Pageable pageable);
-    Page<ArticleEntity> findByAuthorUserNameOrderBySavesCountDesc(String userName, Pageable pageable);
+    Page<ArticleEntity> findByAuthorUserNameAndIsPrivateFalseOrderByCreatedAtDesc(String userName, Pageable pageable);
+    Page<ArticleEntity> findByAuthorUserNameAndIsPrivateFalseOrderByCreatedAtAsc(String userName, Pageable pageable);
+    Page<ArticleEntity> findByAuthorUserNameAndIsPrivateFalseOrderByLikesCountDesc(String userName, Pageable pageable);
+    Page<ArticleEntity> findByAuthorUserNameAndIsPrivateFalseOrderBySavesCountDesc(String userName, Pageable pageable);
 
-    @Query("SELECT a FROM ArticleEntity a WHERE a.author.userName = :userName ORDER BY SIZE(a.comments) DESC, a.createdAt DESC")
-    Page<ArticleEntity> findByAuthorUserNameOrderByCommentsCountDesc(@Param("userName") String userName, Pageable pageable);
+    @Query("SELECT a FROM ArticleEntity a WHERE a.author.userName = :userName AND a.isPrivate = false ORDER BY SIZE(a.comments) DESC, a.createdAt DESC")
+    Page<ArticleEntity> findByAuthorUserNameAndIsPrivateFalseOrderByCommentsCountDesc(@Param("userName") String userName, Pageable pageable);
+
+    Page<ArticleEntity> findByAuthorIdAndIsPrivateTrueOrderByCreatedAtDesc(UUID authorId, Pageable pageable);
+    Page<ArticleEntity> findByAuthorIdAndIsPrivateTrueOrderByCreatedAtAsc(UUID authorId, Pageable pageable);
+    Page<ArticleEntity> findByAuthorIdAndIsPrivateTrueOrderByLikesCountDesc(UUID authorId, Pageable pageable);
+    Page<ArticleEntity> findByAuthorIdAndIsPrivateTrueOrderBySavesCountDesc(UUID authorId, Pageable pageable);
+
+    @Query("SELECT a FROM ArticleEntity a WHERE a.author.id = :authorId AND a.isPrivate = true ORDER BY SIZE(a.comments) DESC, a.createdAt DESC")
+    Page<ArticleEntity> findByAuthorIdAndIsPrivateTrueOrderByCommentsCountDesc(@Param("authorId") UUID authorId, Pageable pageable);
 
     long countByAuthorId(UUID authorId);
+    long countByAuthorIdAndIsPrivateFalse(UUID authorId);
 
     boolean existsByAuthorIdAndTitle(UUID authorId, String title);
     boolean existsByAuthorIdAndTitleAndIdNot(UUID authorId, String title, UUID excludeId);
 
-    Page<ArticleEntity> findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(String title, Pageable pageable);
-    Page<ArticleEntity> findByTitleContainingIgnoreCaseOrderByCreatedAtAsc(String title, Pageable pageable);
-    Page<ArticleEntity> findByTitleContainingIgnoreCaseOrderByLikesCountDesc(String title, Pageable pageable);
-    Page<ArticleEntity> findByTitleContainingIgnoreCaseOrderBySavesCountDesc(String title, Pageable pageable);
+    Page<ArticleEntity> findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByCreatedAtDesc(String title, Pageable pageable);
+    Page<ArticleEntity> findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByCreatedAtAsc(String title, Pageable pageable);
+    Page<ArticleEntity> findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByLikesCountDesc(String title, Pageable pageable);
+    Page<ArticleEntity> findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderBySavesCountDesc(String title, Pageable pageable);
 
-    @Query("SELECT a FROM ArticleEntity a WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :title, '%')) ORDER BY SIZE(a.comments) DESC, a.createdAt DESC")
-    Page<ArticleEntity> findByTitleContainingIgnoreCaseOrderByCommentsCountDesc(@Param("title") String title, Pageable pageable);
+    @Query("SELECT a FROM ArticleEntity a WHERE LOWER(a.title) LIKE LOWER(CONCAT('%', :title, '%')) AND a.isPrivate = false ORDER BY SIZE(a.comments) DESC, a.createdAt DESC")
+    Page<ArticleEntity> findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByCommentsCountDesc(@Param("title") String title, Pageable pageable);
 
-    Optional<ArticleEntity> findByAuthorUserNameAndSlug(String userName, String slug);
+    Optional<ArticleEntity> findByAuthorUserNameAndSlugAndIsPrivateFalse(String userName, String slug);
 }

@@ -49,12 +49,15 @@ public class CreateArticleUseCase {
             throw new BusinessRuleException("You already have an article with this title");
         }
 
+        Boolean isPrivate = request.isPrivate() != null ? request.isPrivate() : false;
+
         Article article = new Article(
                 title,
                 slug,
                 request.originalPost(),
                 request.tags(),
-                request.description()
+                request.description(),
+                isPrivate
         );
 
         Article savedArticle = articleRepository.save(article);
@@ -63,7 +66,9 @@ public class CreateArticleUseCase {
             throw new BusinessRuleException("Failed to save article");
         }
 
-        authorRepository.addCoinsToCurrentAuthor(config.getCoinsPerArticle());
+        if (!isPrivate) {
+            authorRepository.addCoinsToCurrentAuthor(config.getCoinsPerArticle());
+        }
 
         return new CreateArticleResponse(
                 "Article saved successfully",

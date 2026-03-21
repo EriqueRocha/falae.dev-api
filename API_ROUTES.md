@@ -459,7 +459,8 @@ Documentacao das rotas da API organizadas por controller.
   "title": "string",
   "description": "string",
   "tags": ["string"],
-  "originalPost": "string"
+  "originalPost": "string",
+  "isPrivate": "boolean | null"
 }
 ```
 
@@ -473,7 +474,7 @@ Documentacao das rotas da API organizadas por controller.
 }
 ```
 
-> **Nota:** Ao criar um artigo, o autor recebe bugCoins automaticamente conforme configurado em `ForumConfig.coinsPerArticle`.
+> **Nota:** O campo `isPrivate` permite salvar o artigo como rascunho privado. Se `true`, o artigo nao aparece em nenhuma listagem publica e os arquivos sao salvos em uma pasta `private/` no R2. Se `false` ou `null`, o artigo e publico. Ao criar um artigo publico, o autor recebe bugCoins automaticamente conforme configurado em `ForumConfig.coinsPerArticle`. Artigos privados nao geram bugCoins ate serem publicados.
 
 ---
 
@@ -590,7 +591,8 @@ Documentacao das rotas da API organizadas por controller.
       "savesCount": "int",
       "isLiked": "boolean | null",
       "isDisliked": "boolean | null",
-      "isSaved": "boolean | null"
+      "isSaved": "boolean | null",
+      "isPrivate": "boolean"
     }
   ],
   "page": "int",
@@ -600,6 +602,8 @@ Documentacao das rotas da API organizadas por controller.
   "hasNext": "boolean"
 }
 ```
+
+> **Nota:** Artigos com `isPrivate: true` nao aparecem nesta listagem.
 
 ---
 
@@ -651,9 +655,12 @@ Documentacao das rotas da API organizadas por controller.
   "savesCount": "int",
   "isLiked": "boolean | null",
   "isDisliked": "boolean | null",
-  "isSaved": "boolean | null"
+  "isSaved": "boolean | null",
+  "isPrivate": "boolean"
 }
 ```
+
+> **Nota:** Artigos privados so podem ser acessados pelo autor dono. Outros usuarios recebem 404.
 
 ---
 
@@ -690,9 +697,12 @@ Documentacao das rotas da API organizadas por controller.
   "savesCount": "int",
   "isLiked": "boolean | null",
   "isDisliked": "boolean | null",
-  "isSaved": "boolean | null"
+  "isSaved": "boolean | null",
+  "isPrivate": "boolean"
 }
 ```
+
+> **Nota:** Apenas artigos publicos podem ser acessados por esta rota.
 
 ---
 
@@ -765,6 +775,42 @@ Documentacao das rotas da API organizadas por controller.
   "message": "string"
 }
 ```
+
+---
+
+### GET `/article/private`
+**Descricao:** Lista artigos privados do autor logado. Requer autenticacao de autor.
+
+**Query Parameters:**
+
+| Nome | Tipo | Default | Descricao |
+|------|------|---------|-----------|
+| page | int | 0 | Numero da pagina |
+| size | int | 20 | Tamanho da pagina |
+| sort | AuthorContentSortType | RECENT | Ordenacao (RECENT, OLDEST, LIKES, SAVES, COMMENTS) |
+
+**Response:** `ArticlePageResponse` (mesmo formato de `/article`)
+
+> **Nota:** Retorna apenas artigos com `isPrivate: true` do autor autenticado.
+
+---
+
+### POST `/article/{articleId}/publish`
+**Descricao:** Publica um artigo privado, mudando `isPrivate` de `true` para `false`. Requer autenticacao de autor (dono do artigo).
+
+**Path Parameters:**
+
+| Nome | Tipo | Descricao |
+|------|------|-----------|
+| articleId | UUID | ID do artigo privado |
+
+**Response:** `200 OK` (corpo vazio)
+
+**Erros:**
+- `404 Not Found` - Artigo nao encontrado ou nao pertence ao autor logado
+- `422 Unprocessable Entity` - Artigo ja e publico
+
+> **Nota:** Ao publicar um artigo, o autor recebe bugCoins automaticamente conforme configurado em `ForumConfig.coinsPerArticle`.
 
 ---
 

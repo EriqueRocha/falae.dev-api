@@ -164,6 +164,7 @@ public class JpaFeedRepository implements FeedRepository {
                 FROM articles a
                 LEFT JOIN authors au ON a.author_id = au.id
                 """ + articleUserJoins + """
+                WHERE a.is_private = false
 
                 UNION ALL
 
@@ -232,7 +233,7 @@ public class JpaFeedRepository implements FeedRepository {
     private String buildCountQuery(String typeFilter) {
         return """
             SELECT COUNT(*) FROM (
-                SELECT a.id, 'ARTICLE' as type FROM articles a
+                SELECT a.id, 'ARTICLE' as type FROM articles a WHERE a.is_private = false
                 UNION ALL
                 SELECT t.id, 'TOPIC' as type FROM topics t
                 UNION ALL

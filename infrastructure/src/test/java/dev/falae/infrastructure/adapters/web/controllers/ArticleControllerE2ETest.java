@@ -47,7 +47,8 @@ class ArticleControllerE2ETest extends BaseIntegrationTest {
                 "New Article Title",
                 "Description of new article",
                 List.of("java", "spring", "testing"),
-                null
+                null,
+                false
         );
         HttpHeaders headers = createAuthHeaders(authorToken);
         HttpEntity<SaveArticleRequest> entity = new HttpEntity<>(request, headers);
@@ -72,7 +73,8 @@ class ArticleControllerE2ETest extends BaseIntegrationTest {
                 "New Article Title",
                 "Description of new article",
                 List.of("java", "spring"),
-                null
+                null,
+                false
         );
         HttpEntity<SaveArticleRequest> entity = new HttpEntity<>(request);
 

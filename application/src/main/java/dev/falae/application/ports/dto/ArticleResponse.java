@@ -25,5 +25,6 @@ public record ArticleResponse(
         int savesCount,
         Boolean isLiked,
         Boolean isDisliked,
-        Boolean isSaved
+        Boolean isSaved,
+        Boolean isPrivate
 ) {}

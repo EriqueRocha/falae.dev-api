@@ -107,7 +107,7 @@ public class JpaSearchRepository implements SearchRepository {
                     NULL as parent_slug
                 FROM articles a
                 LEFT JOIN authors au ON a.author_id = au.id
-                WHERE a.tags && CAST(:tags AS TEXT[])
+                WHERE a.is_private = false AND a.tags && CAST(:tags AS TEXT[])
             """);
             needsUnion = true;
         }
@@ -187,7 +187,7 @@ public class JpaSearchRepository implements SearchRepository {
         boolean needsUnion = false;
 
         if (type == SearchContentType.ALL || type == SearchContentType.ARTICLE) {
-            sb.append("SELECT a.id FROM articles a WHERE a.tags && CAST(:tags AS TEXT[])");
+            sb.append("SELECT a.id FROM articles a WHERE a.is_private = false AND a.tags && CAST(:tags AS TEXT[])");
             needsUnion = true;
         }
 

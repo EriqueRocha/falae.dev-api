@@ -88,7 +88,10 @@ public class ArticleEntity extends BaseEntity {
     @JsonManagedReference
     private List<CommentEntity> comments = new ArrayList<>();
 
-    public ArticleEntity(AuthorEntity author, Boolean isMarkdown, String title, String slug, String coverImage, String originalPost, List<String> tags, List<String> imagePaths, String description, String urlArticleContent) {
+    @Column(name = "is_private", nullable = false)
+    private Boolean isPrivate = false;
+
+    public ArticleEntity(AuthorEntity author, Boolean isMarkdown, String title, String slug, String coverImage, String originalPost, List<String> tags, List<String> imagePaths, String description, String urlArticleContent, Boolean isPrivate) {
         this.author = author;
         this.isMarkdown = isMarkdown;
         this.title = title;
@@ -99,6 +102,7 @@ public class ArticleEntity extends BaseEntity {
         this.imagePaths = imagePaths;
         this.description = description;
         this.urlArticleContent = urlArticleContent;
+        this.isPrivate = isPrivate != null ? isPrivate : false;
     }
 
     public ArticleEntity() {
@@ -249,5 +253,13 @@ public class ArticleEntity extends BaseEntity {
 
     public void setComments(List<CommentEntity> comments) {
         this.comments = comments;
+    }
+
+    public Boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(Boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }

@@ -232,6 +232,18 @@ public class BeanConfiguration {
     }
 
     @Bean
+    public GetPrivateArticlesUseCase getPrivateArticlesUseCase(ArticleRepository articleRepository) {
+        return new GetPrivateArticlesUseCase(articleRepository);
+    }
+
+    @Bean
+    public PublishArticleUseCase publishArticleUseCase(ArticleRepository articleRepository,
+                                                        AuthorRepository authorRepository,
+                                                        ForumConfigRepository forumConfigRepository) {
+        return new PublishArticleUseCase(articleRepository, authorRepository, forumConfigRepository);
+    }
+
+    @Bean
     public GetAuthorTopicsUseCase getAuthorTopicsUseCase(TopicRepository topicRepository) {
         return new GetAuthorTopicsUseCase(topicRepository);
     }

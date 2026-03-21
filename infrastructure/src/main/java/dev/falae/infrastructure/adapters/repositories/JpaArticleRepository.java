@@ -10,6 +10,7 @@ import dev.falae.core.domain.entities.Article;
 import dev.falae.infrastructure.adapters.repositories.entities.ArticleEntity;
 import dev.falae.infrastructure.adapters.repositories.entities.AuthorEntity;
 import dev.falae.infrastructure.adapters.repositories.jpa.ArticleJpaRepository;
+import dev.falae.infrastructure.adapters.services.S3StorageService;
 import dev.falae.infrastructure.config.security.AuthenticatedAuthorProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,11 +26,13 @@ public class JpaArticleRepository implements ArticleRepository {
     private final ArticleJpaRepository articleJpaRepository;
     private final JpaAuthorRepository jpaAuthorRepository;
     private final AuthenticatedAuthorProvider authenticatedAuthorProvider;
+    private final S3StorageService s3StorageService;
 
-    public JpaArticleRepository(ArticleJpaRepository articleJpaRepository, JpaAuthorRepository jpaAuthorRepository, AuthenticatedAuthorProvider authenticatedAuthorProvider) {
+    public JpaArticleRepository(ArticleJpaRepository articleJpaRepository, JpaAuthorRepository jpaAuthorRepository, AuthenticatedAuthorProvider authenticatedAuthorProvider, S3StorageService s3StorageService) {
         this.articleJpaRepository = articleJpaRepository;
         this.jpaAuthorRepository = jpaAuthorRepository;
         this.authenticatedAuthorProvider = authenticatedAuthorProvider;
+        this.s3StorageService = s3StorageService;
     }
 
     @Override
@@ -56,7 +59,8 @@ public class JpaArticleRepository implements ArticleRepository {
                 entity.getLikesCount(),
                 entity.getSavesCount(),
                 entity.getDislikesCount(),
-                entity.getCommentsCount()
+                entity.getCommentsCount(),
+                entity.isPrivate()
         );
     }
 
@@ -73,7 +77,8 @@ public class JpaArticleRepository implements ArticleRepository {
                 article.getTags(),
                 article.getImagePaths(),
                 article.getDescription(),
-                null
+                null,
+                article.getIsPrivate()
         );
         entity.setId(article.getId());
         return entity;
@@ -91,6 +96,13 @@ public class JpaArticleRepository implements ArticleRepository {
         ArticleEntity articleEntity = articleJpaRepository.findById(articleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Article", articleId));
 
+        if (Boolean.TRUE.equals(articleEntity.isPrivate())) {
+            AuthorEntity currentAuthor = authenticatedAuthorProvider.getCurrentAuthorOrNull();
+            if (currentAuthor == null || !articleEntity.getAuthor().getId().equals(currentAuthor.getId())) {
+                throw new ResourceNotFoundException("Article", articleId);
+            }
+        }
+
         return toArticleResponse(articleEntity);
     }
 
@@ -99,9 +111,9 @@ public class JpaArticleRepository implements ArticleRepository {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<ArticleEntity> articlePage = switch (sortType) {
-            case RECENT -> articleJpaRepository.findAllByOrderByCreatedAtDesc(pageable);
-            case OLDEST -> articleJpaRepository.findAllByOrderByCreatedAtAsc(pageable);
-            case LIKES -> articleJpaRepository.findAllByOrderByLikesCountDesc(pageable);
+            case RECENT -> articleJpaRepository.findByIsPrivateFalseOrderByCreatedAtDesc(pageable);
+            case OLDEST -> articleJpaRepository.findByIsPrivateFalseOrderByCreatedAtAsc(pageable);
+            case LIKES -> articleJpaRepository.findByIsPrivateFalseOrderByLikesCountDesc(pageable);
         };
 
         List<ArticleResponse> articles = articlePage.getContent().stream()
@@ -123,11 +135,11 @@ public class JpaArticleRepository implements ArticleRepository {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<ArticleEntity> articlePage = switch (sortType) {
-            case RECENT -> articleJpaRepository.findByAuthorUserNameOrderByCreatedAtDesc(userName, pageable);
-            case OLDEST -> articleJpaRepository.findByAuthorUserNameOrderByCreatedAtAsc(userName, pageable);
-            case LIKES -> articleJpaRepository.findByAuthorUserNameOrderByLikesCountDesc(userName, pageable);
-            case SAVES -> articleJpaRepository.findByAuthorUserNameOrderBySavesCountDesc(userName, pageable);
-            case COMMENTS -> articleJpaRepository.findByAuthorUserNameOrderByCommentsCountDesc(userName, pageable);
+            case RECENT -> articleJpaRepository.findByAuthorUserNameAndIsPrivateFalseOrderByCreatedAtDesc(userName, pageable);
+            case OLDEST -> articleJpaRepository.findByAuthorUserNameAndIsPrivateFalseOrderByCreatedAtAsc(userName, pageable);
+            case LIKES -> articleJpaRepository.findByAuthorUserNameAndIsPrivateFalseOrderByLikesCountDesc(userName, pageable);
+            case SAVES -> articleJpaRepository.findByAuthorUserNameAndIsPrivateFalseOrderBySavesCountDesc(userName, pageable);
+            case COMMENTS -> articleJpaRepository.findByAuthorUserNameAndIsPrivateFalseOrderByCommentsCountDesc(userName, pageable);
         };
 
         List<ArticleResponse> articles = articlePage.getContent().stream()
@@ -162,6 +174,14 @@ public class JpaArticleRepository implements ArticleRepository {
             isSaved = entity.getAuthorsSavedArticle().contains(currentAuthor);
         }
 
+        String coverImage = entity.getCoverImage();
+        String urlArticleContent = entity.getUrlArticleContent();
+
+        if (Boolean.TRUE.equals(entity.isPrivate())) {
+            coverImage = s3StorageService.generatePresignedUrl(coverImage);
+            urlArticleContent = s3StorageService.generatePresignedUrl(urlArticleContent);
+        }
+
         return new ArticleResponse(
                 entity.getId(),
                 entity.getAuthor() != null ? entity.getAuthor().getId() : null,
@@ -172,18 +192,19 @@ public class JpaArticleRepository implements ArticleRepository {
                 entity.isMarkdown(),
                 entity.getTitle(),
                 entity.getSlug(),
-                entity.getCoverImage(),
+                coverImage,
                 entity.getOriginalPost(),
                 entity.getTags(),
                 entity.getDescription(),
-                entity.getUrlArticleContent(),
+                urlArticleContent,
                 entity.getLikesCount(),
                 entity.getDislikesCount(),
                 entity.getCommentsCount(),
                 entity.getSavesCount(),
                 isLiked,
                 isDisliked,
-                isSaved
+                isSaved,
+                entity.isPrivate()
         );
     }
 
@@ -327,11 +348,11 @@ public class JpaArticleRepository implements ArticleRepository {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<ArticleEntity> articlePage = switch (sortType) {
-            case RECENT -> articleJpaRepository.findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(title, pageable);
-            case OLDEST -> articleJpaRepository.findByTitleContainingIgnoreCaseOrderByCreatedAtAsc(title, pageable);
-            case LIKES -> articleJpaRepository.findByTitleContainingIgnoreCaseOrderByLikesCountDesc(title, pageable);
-            case SAVES -> articleJpaRepository.findByTitleContainingIgnoreCaseOrderBySavesCountDesc(title, pageable);
-            case COMMENTS -> articleJpaRepository.findByTitleContainingIgnoreCaseOrderByCommentsCountDesc(title, pageable);
+            case RECENT -> articleJpaRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByCreatedAtDesc(title, pageable);
+            case OLDEST -> articleJpaRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByCreatedAtAsc(title, pageable);
+            case LIKES -> articleJpaRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByLikesCountDesc(title, pageable);
+            case SAVES -> articleJpaRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderBySavesCountDesc(title, pageable);
+            case COMMENTS -> articleJpaRepository.findByTitleContainingIgnoreCaseAndIsPrivateFalseOrderByCommentsCountDesc(title, pageable);
         };
 
         List<ArticleResponse> articles = articlePage.getContent().stream()
@@ -357,7 +378,7 @@ public class JpaArticleRepository implements ArticleRepository {
 
     @Override
     public ArticleResponse findByAuthorUserNameAndSlug(String userName, String slug) {
-        ArticleEntity entity = articleJpaRepository.findByAuthorUserNameAndSlug(userName, slug)
+        ArticleEntity entity = articleJpaRepository.findByAuthorUserNameAndSlugAndIsPrivateFalse(userName, slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found for author: " + userName + " with slug: " + slug));
         return toArticleResponse(entity);
     }
@@ -399,5 +420,51 @@ public class JpaArticleRepository implements ArticleRepository {
         }
 
         articleJpaRepository.save(articleEntity);
+    }
+
+    @Override
+    public ArticlePageResponse findPrivateByCurrentAuthor(int page, int size, AuthorContentSortType sortType) {
+        AuthorEntity author = authenticatedAuthorProvider.getCurrentAuthor();
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ArticleEntity> articlePage = switch (sortType) {
+            case RECENT -> articleJpaRepository.findByAuthorIdAndIsPrivateTrueOrderByCreatedAtDesc(author.getId(), pageable);
+            case OLDEST -> articleJpaRepository.findByAuthorIdAndIsPrivateTrueOrderByCreatedAtAsc(author.getId(), pageable);
+            case LIKES -> articleJpaRepository.findByAuthorIdAndIsPrivateTrueOrderByLikesCountDesc(author.getId(), pageable);
+            case SAVES -> articleJpaRepository.findByAuthorIdAndIsPrivateTrueOrderBySavesCountDesc(author.getId(), pageable);
+            case COMMENTS -> articleJpaRepository.findByAuthorIdAndIsPrivateTrueOrderByCommentsCountDesc(author.getId(), pageable);
+        };
+
+        List<ArticleResponse> articles = articlePage.getContent().stream()
+                .map(this::toArticleResponse)
+                .toList();
+
+        return new ArticlePageResponse(
+                articles,
+                articlePage.getNumber(),
+                articlePage.getSize(),
+                articlePage.getTotalElements(),
+                articlePage.getTotalPages(),
+                articlePage.hasNext()
+        );
+    }
+
+    @Override
+    public void publishArticle(UUID articleId) {
+        AuthorEntity author = authenticatedAuthorProvider.getCurrentAuthor();
+        ArticleEntity articleEntity = articleJpaRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Article", articleId));
+
+        if (!articleEntity.getAuthor().getId().equals(author.getId())) {
+            throw new ResourceNotFoundException("Article", articleId);
+        }
+
+        articleEntity.setPrivate(false);
+        articleJpaRepository.save(articleEntity);
+    }
+
+    @Override
+    public long countPublicByAuthorId(UUID authorId) {
+        return articleJpaRepository.countByAuthorIdAndIsPrivateFalse(authorId);
     }
 }

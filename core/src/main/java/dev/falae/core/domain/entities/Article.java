@@ -24,8 +24,9 @@ public class Article {
     private int commentsCount;
     private String urlArticleContent;
     private List<Comment> comments = new ArrayList<>();
+    private Boolean isPrivate;
 
-    public Article(UUID id, Author author, LocalDateTime creationDate, Boolean isMarkdown, String title, String slug, String coverImage, String originalPost, List<String> tags, List<String> imagePaths, String description, String urlArticleContent, int likesCount, int savesCount, int dislikesCount, int commentsCount) {
+    public Article(UUID id, Author author, LocalDateTime creationDate, Boolean isMarkdown, String title, String slug, String coverImage, String originalPost, List<String> tags, List<String> imagePaths, String description, String urlArticleContent, int likesCount, int savesCount, int dislikesCount, int commentsCount, Boolean isPrivate) {
         this.id = id;
         this.author = author;
         this.creationDate = creationDate;
@@ -42,14 +43,16 @@ public class Article {
         this.savesCount = savesCount;
         this.dislikesCount = dislikesCount;
         this.commentsCount = commentsCount;
+        this.isPrivate = isPrivate;
     }
-    public Article(String title, String slug, String originalPost, List<String> tags, String description) {
+    public Article(String title, String slug, String originalPost, List<String> tags, String description, Boolean isPrivate) {
         this.id = UUID.randomUUID();
         this.title = title;
         this.slug = slug;
         this.originalPost = originalPost;
         this.tags = tags;
         this.description = description;
+        this.isPrivate = isPrivate != null ? isPrivate : false;
     }
 
     public Article(UUID id, Author author, Boolean isMarkdown) {
@@ -210,5 +213,13 @@ public class Article {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public Boolean getIsPrivate() {
+        return isPrivate;
+    }
+
+    public void setIsPrivate(Boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }

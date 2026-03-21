@@ -5,7 +5,6 @@ import dev.falae.application.ports.dto.AuthorProfileResponse;
 import dev.falae.application.ports.repositories.AuthorRepository;
 import dev.falae.core.domain.entities.Author;
 import dev.falae.infrastructure.adapters.repositories.entities.AuthorEntity;
-import dev.falae.infrastructure.adapters.repositories.entities.AuthorEntity;
 import dev.falae.infrastructure.adapters.repositories.jpa.ArticleJpaRepository;
 import dev.falae.infrastructure.adapters.repositories.jpa.AuthorJpaRepository;
 import dev.falae.infrastructure.adapters.repositories.jpa.CommentJpaRepository;
@@ -74,7 +73,7 @@ public class JpaAuthorRepository implements AuthorRepository {
         AuthorEntity entity = jpaRepository.findByUserName(userName)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", userName));
 
-        long articleCount = articleJpaRepository.countByAuthorId(entity.getId());
+        long articleCount = articleJpaRepository.countByAuthorIdAndIsPrivateFalse(entity.getId());
         long topicCount = topicJpaRepository.countByAuthorId(entity.getId());
         long commentCount = commentJpaRepository.countByAuthorId(entity.getId());
 

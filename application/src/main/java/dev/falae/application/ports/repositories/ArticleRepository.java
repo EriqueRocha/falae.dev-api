@@ -32,4 +32,7 @@ public interface ArticleRepository {
     boolean hasComments(UUID articleId);
     ArticleResponse findByAuthorUserNameAndSlug(String userName, String slug);
     void update(UUID articleId, String title, String slug, String description, List<String> tags, String originalPost, List<String> deletedImagePaths);
+    ArticlePageResponse findPrivateByCurrentAuthor(int page, int size, AuthorContentSortType sortType);
+    void publishArticle(UUID articleId);
+    long countPublicByAuthorId(UUID authorId);
 }

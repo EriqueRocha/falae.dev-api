@@ -5,19 +5,31 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
 public class S3StorageService implements StorageService {
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     @Value("${r2.bucket}")
     private String bucketName;
 
-    public S3StorageService(S3Client s3Client) {
+    @Value("${r2.public-url}")
+    private String publicUrl;
+
+    @Value("${r2.presigned-url-expiration-minutes:60}")
+    private int presignedUrlExpirationMinutes;
+
+    public S3StorageService(S3Client s3Client, S3Presigner s3Presigner) {
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
     }
 
     @Override
@@ -85,5 +97,43 @@ public class S3StorageService implements StorageService {
             return null;
         }
         return url.substring(keyStart + 1);
+    }
+
+    public String generatePresignedUrl(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return null;
+        }
+
+        String key = extractKeyFromPublicUrl(fileUrl);
+        if (key == null || key.isEmpty()) {
+            return fileUrl;
+        }
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(presignedUrlExpirationMinutes))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
+        return presignedRequest.url().toString();
+    }
+
+    private String extractKeyFromPublicUrl(String url) {
+        if (url == null || url.isEmpty()) {
+            return null;
+        }
+        if (url.startsWith(publicUrl)) {
+            String path = url.substring(publicUrl.length());
+            if (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            return path;
+        }
+        return extractKeyFromUrl(url);
     }
 }
