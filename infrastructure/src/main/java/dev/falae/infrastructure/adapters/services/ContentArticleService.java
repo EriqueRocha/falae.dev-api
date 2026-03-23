@@ -123,13 +123,13 @@ public class ContentArticleService {
 
         if (fileName == null) {
             throw new IllegalArgumentException(
-                    "O arquivo está nulo. São aceitos apenas JPG/JPEG, PNG, GIF ou WEBP."
+                    "O arquivo está nulo. São aceitos apenas JPG/JPEG, PNG, GIF, WEBP ou SVG."
             );
         }
 
-        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg") && !fileName.endsWith(".png") && !fileName.endsWith(".gif") && !fileName.endsWith(".webp")) {
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg") && !fileName.endsWith(".png") && !fileName.endsWith(".gif") && !fileName.endsWith(".webp") && !fileName.endsWith(".svg")) {
             throw new IllegalArgumentException(
-                    "Formato não aceito. Aceito apenas JPG/JPEG, PNG, GIF e WEBP."
+                    "Formato não aceito. Aceito apenas JPG/JPEG, PNG, GIF, WEBP e SVG."
             );
         }
 
@@ -184,13 +184,13 @@ public class ContentArticleService {
 
         if (fileName == null) {
             throw new IllegalArgumentException(
-                    "O arquivo está nulo. São aceitos apenas JPG/JPEG, PNG, GIF ou WEBP."
+                    "O arquivo está nulo. São aceitos apenas JPG/JPEG, PNG, GIF, WEBP ou SVG."
             );
         }
 
-        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg") && !fileName.endsWith(".png") && !fileName.endsWith(".gif") && !fileName.endsWith(".webp")) {
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg") && !fileName.endsWith(".png") && !fileName.endsWith(".gif") && !fileName.endsWith(".webp") && !fileName.endsWith(".svg")) {
             throw new IllegalArgumentException(
-                    "Formato não aceito. Aceito apenas JPG/JPEG, PNG, GIF e WEBP."
+                    "Formato não aceito. Aceito apenas JPG/JPEG, PNG, GIF, WEBP e SVG."
             );
         }
 
@@ -217,6 +217,7 @@ public class ContentArticleService {
             case "png" -> "image/png";
             case "gif" -> "image/gif";
             case "webp" -> "image/webp";
+            case "svg" -> "image/svg+xml";
             default -> "application/octet-stream";
         };
     }
@@ -227,8 +228,8 @@ public class ContentArticleService {
         String fileUrl;
         try {
             String ext = getFileExtension(file.getOriginalFilename());
-            if (!ext.equals("jpg") && !ext.equals("jpeg") && !ext.equals("png") && !ext.equals("gif") && !ext.equals("webp")) {
-                throw new IllegalArgumentException("Somente imagens do tipo: JPG/JPEG, PNG, GIF e WEBP são permitidos");
+            if (!ext.equals("jpg") && !ext.equals("jpeg") && !ext.equals("png") && !ext.equals("gif") && !ext.equals("webp") && !ext.equals("svg")) {
+                throw new IllegalArgumentException("Somente imagens do tipo: JPG/JPEG, PNG, GIF, WEBP e SVG são permitidos");
             }
 
             String timestamp = String.valueOf(System.currentTimeMillis());
