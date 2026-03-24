@@ -10,14 +10,12 @@ import dev.falae.core.domain.entities.Article;
 import dev.falae.infrastructure.adapters.repositories.entities.ArticleEntity;
 import dev.falae.infrastructure.adapters.repositories.entities.AuthorEntity;
 import dev.falae.infrastructure.adapters.repositories.jpa.ArticleJpaRepository;
-import dev.falae.infrastructure.adapters.services.S3StorageService;
 import dev.falae.infrastructure.config.security.AuthenticatedAuthorProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,13 +25,11 @@ public class JpaArticleRepository implements ArticleRepository {
     private final ArticleJpaRepository articleJpaRepository;
     private final JpaAuthorRepository jpaAuthorRepository;
     private final AuthenticatedAuthorProvider authenticatedAuthorProvider;
-    private final S3StorageService s3StorageService;
 
-    public JpaArticleRepository(ArticleJpaRepository articleJpaRepository, JpaAuthorRepository jpaAuthorRepository, AuthenticatedAuthorProvider authenticatedAuthorProvider, S3StorageService s3StorageService) {
+    public JpaArticleRepository(ArticleJpaRepository articleJpaRepository, JpaAuthorRepository jpaAuthorRepository, AuthenticatedAuthorProvider authenticatedAuthorProvider) {
         this.articleJpaRepository = articleJpaRepository;
         this.jpaAuthorRepository = jpaAuthorRepository;
         this.authenticatedAuthorProvider = authenticatedAuthorProvider;
-        this.s3StorageService = s3StorageService;
     }
 
     @Override
@@ -175,14 +171,6 @@ public class JpaArticleRepository implements ArticleRepository {
             isSaved = entity.getAuthorsSavedArticle().contains(currentAuthor);
         }
 
-        String coverImage = entity.getCoverImage();
-        String urlArticleContent = entity.getUrlArticleContent();
-
-        if (Boolean.TRUE.equals(entity.isPrivate())) {
-            coverImage = s3StorageService.generatePresignedUrl(coverImage);
-            urlArticleContent = s3StorageService.generatePresignedUrl(urlArticleContent);
-        }
-
         return new ArticleResponse(
                 entity.getId(),
                 entity.getAuthor() != null ? entity.getAuthor().getId() : null,
@@ -193,11 +181,11 @@ public class JpaArticleRepository implements ArticleRepository {
                 entity.isMarkdown(),
                 entity.getTitle(),
                 entity.getSlug(),
-                coverImage,
+                entity.getCoverImage(),
                 entity.getOriginalPost(),
                 entity.getTags(),
                 entity.getDescription(),
-                urlArticleContent,
+                entity.getUrlArticleContent(),
                 entity.getLikesCount(),
                 entity.getDislikesCount(),
                 entity.getCommentsCount(),
@@ -458,20 +446,6 @@ public class JpaArticleRepository implements ArticleRepository {
 
         if (!articleEntity.getAuthor().getId().equals(author.getId())) {
             throw new ResourceNotFoundException("Article", articleId);
-        }
-
-        String newContentUrl = s3StorageService.moveFileToPublicPath(articleEntity.getUrlArticleContent());
-        articleEntity.setUrlArticleContent(newContentUrl);
-
-        String newCoverUrl = s3StorageService.moveFileToPublicPath(articleEntity.getCoverImage());
-        articleEntity.setCoverImage(newCoverUrl);
-
-        if (articleEntity.getImagePaths() != null && !articleEntity.getImagePaths().isEmpty()) {
-            List<String> newImagePaths = new ArrayList<>();
-            for (String imagePath : articleEntity.getImagePaths()) {
-                newImagePaths.add(s3StorageService.moveFileToPublicPath(imagePath));
-            }
-            articleEntity.setImagePaths(newImagePaths);
         }
 
         articleEntity.setPrivate(false);

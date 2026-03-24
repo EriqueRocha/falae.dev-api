@@ -82,8 +82,7 @@ public class ContentArticleService {
     private void deleteOldContentFiles(Article article) {
         AuthorEntity author = authenticatedAuthorProvider.getCurrentAuthor();
         String baseFileName = article.getSlug();
-        String privatePath = Boolean.TRUE.equals(article.getIsPrivate()) ? "/private" : "";
-        String basePath = author.getId() + privatePath + "/" + article.getId() + "/" + baseFileName;
+        String basePath = author.getId() + "/" + article.getId() + "/" + baseFileName;
 
         List<String> possibleKeys = List.of(
                 basePath + ".md",
@@ -152,8 +151,7 @@ public class ContentArticleService {
             }
 
             String fileName = article.getSlug() + "." + ext;
-            String privatePath = Boolean.TRUE.equals(article.getIsPrivate()) ? "/private" : "";
-            String filePath = authorId + privatePath + "/" + article.getId() + "/" + fileName;
+            String filePath = authorId + "/" + article.getId() + "/" + fileName;
 
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -234,8 +232,7 @@ public class ContentArticleService {
 
             String timestamp = String.valueOf(System.currentTimeMillis());
             String fileName = timestamp + "." + ext;
-            String privatePath = Boolean.TRUE.equals(article.getIsPrivate()) ? "/private" : "";
-            String filePath = author.getId() + privatePath + "/" + article.getId() + "/" + fileName;
+            String filePath = author.getId() + "/" + article.getId() + "/" + fileName;
 
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
