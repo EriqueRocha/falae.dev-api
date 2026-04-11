@@ -398,9 +398,7 @@ public class JpaArticleRepository implements ArticleRepository {
         if (tags != null) {
             articleEntity.setTags(tags);
         }
-        if (originalPost != null) {
-            articleEntity.setOriginalPost(originalPost);
-        }
+        articleEntity.setOriginalPost(originalPost);
         if (deletedImagePaths != null && !deletedImagePaths.isEmpty()) {
             List<String> currentImagePaths = articleEntity.getImagePaths();
             if (currentImagePaths != null) {
