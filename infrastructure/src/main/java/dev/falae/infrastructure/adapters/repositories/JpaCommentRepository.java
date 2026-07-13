@@ -238,7 +238,7 @@ public class JpaCommentRepository implements CommentRepository {
 
     @Override
     public long countReplies(UUID parentId) {
-        return commentJpaRepository.countDirectReplies(parentId);
+        return commentJpaRepository.countDescendantReplies(parentId);
     }
 
     @Override
@@ -321,7 +321,7 @@ public class JpaCommentRepository implements CommentRepository {
                 entity.isDeleted() ? 0 : entity.getLikes(),
                 entity.isDeleted() ? 0 : entity.getDislikes(),
                 entity.getDepth(),
-                commentJpaRepository.countDirectReplies(entity.getId()),
+                commentJpaRepository.countDescendantReplies(entity.getId()),
                 parentId,
                 articleId,
                 topicId,

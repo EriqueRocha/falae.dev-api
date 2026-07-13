@@ -1127,6 +1127,8 @@ Documentacao das rotas da API organizadas por controller.
 >
 > **Nota:** Os campos `isLiked`, `isDisliked` e `isOwner` sao preenchidos apenas quando o usuario esta autenticado.
 >
+> **Nota:** O campo `replyCount` contabiliza todas as respostas descendentes do comentario, independentemente do nivel da thread. O proprio comentario nao e incluido na contagem.
+>
 > **Nota:** Quando `deleted: true`, os campos `content`, `authorName`, `authorUserName`, `authorProfileImage`, `authorId`, `likes` e `dislikes` retornam `null` ou `0`. O comentario permanece na arvore para manter a estrutura de respostas, permitindo que o front exiba como "[comentario removido]".
 
 ---

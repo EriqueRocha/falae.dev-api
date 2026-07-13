@@ -53,4 +53,7 @@ public interface CommentJpaRepository extends JpaRepository<CommentEntity, UUID>
 
     @Query("SELECT COUNT(c) FROM CommentEntity c WHERE c.author.id = :authorId AND c.deleted = false")
     long countByAuthorId(@Param("authorId") UUID authorId);
+
+    @Query("SELECT COUNT(descendant) FROM CommentEntity descendant, CommentEntity ancestor WHERE ancestor.id = :parentId AND descendant.path LIKE CONCAT(ancestor.path, '/%')")
+    long countDescendantReplies(@Param("parentId") UUID parentId);
 }
