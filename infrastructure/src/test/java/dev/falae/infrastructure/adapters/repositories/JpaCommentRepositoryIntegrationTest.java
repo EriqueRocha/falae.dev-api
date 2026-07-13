@@ -3,6 +3,7 @@ package dev.falae.infrastructure.adapters.repositories;
 import dev.falae.application.exceptions.ResourceNotFoundException;
 import dev.falae.infrastructure.BaseIntegrationTest;
 import dev.falae.infrastructure.TestDataLoader;
+import dev.falae.infrastructure.adapters.repositories.entities.CommentEntity;
 import dev.falae.infrastructure.adapters.repositories.jpa.CommentJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -154,5 +155,35 @@ class JpaCommentRepositoryIntegrationTest extends BaseIntegrationTest {
         long count = jpaCommentRepository.countReplies(commentId);
 
         assertThat(count).isEqualTo(0);
+    }
+
+    @Test
+    void countReplies_WithNestedThread_ReturnsAllDescendants() {
+        CommentEntity root = testDataLoader.getArticleComment1();
+        CommentEntity firstDirectReply = testDataLoader.getArticleComment1Reply();
+        CommentEntity firstNestedReply = createReply(firstDirectReply, "First nested reply");
+        createReply(firstDirectReply, "Second nested reply");
+        createReply(root, "Second direct reply");
+
+        assertThat(jpaCommentRepository.countReplies(root.getId())).isEqualTo(4);
+        assertThat(jpaCommentRepository.countReplies(firstDirectReply.getId())).isEqualTo(2);
+        assertThat(jpaCommentRepository.countReplies(firstNestedReply.getId())).isZero();
+        assertThat(jpaCommentRepository.findCommentResponseById(root.getId()).replyCount()).isEqualTo(4);
+        assertThat(jpaCommentRepository.findReplies(root.getId()))
+                .hasSize(2)
+                .allMatch(reply -> reply.parentId().equals(root.getId()));
+    }
+
+    private CommentEntity createReply(CommentEntity parent, String content) {
+        CommentEntity reply = new CommentEntity();
+        reply.setId(UUID.randomUUID());
+        reply.setAuthor(testDataLoader.getAuthor1());
+        reply.setArticle(parent.getArticle());
+        reply.setTopic(parent.getTopic());
+        reply.setParent(parent);
+        reply.setCommentContent(content);
+        reply.setDepth(parent.getDepth() + 1);
+        reply.setPath(parent.getPath() + "/" + reply.getId());
+        return commentJpaRepository.save(reply);
     }
 }
